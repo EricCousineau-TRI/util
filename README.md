@@ -36,3 +36,15 @@ To set up auto completion to link to your development version, add it to `~/.bas
 *	Add `git-submodule-ext dir-sync` with two options:
 	1.	`super` - Will ensure that all submodule `$GIT_DIR`'s are in the supermodule's `$GIT_DIR/modules/$path`
 	2.	`repo` - Will ensure that all submodule `$GIT_DIR`'s are in the submodule's `$path/.git`
+*   Have `git-submodule-ext` support cloning a repository, where multiple submodules from the same effective repository. Do not clone the same repostory multiple times if appropriately marked.
+    *   Should be robust against different URLs
+    *   Should identify the ground truth submodule via config, leveraging `git-new-workdir` (e.g., `git config submodule.${new_workdir}.orig_workdir`)
+    *   `orig_workdir` will point to the worktree path to maintain integrity; it will NOT point to the `GIT_DIR`
+    *   For nested submodules, should ensure that `orig_workdir` has its submodules intialized to enable them to be `git-new-workdir`'d as well
+    *   Should only track this where `orig_workdir` is underneat the supermodule's worktree
+    *   Example:
+        *   `sandbox/`
+            *   `drake-distro/` - For primary development
+            *   `branches/drake-distro/`
+                *   `issues/5464_return_binding` - `new_workdir` from `:/drake-distro`
+                *   `feature/warm_start_prototype` - `new_workdir` from `:/drake-distro`
